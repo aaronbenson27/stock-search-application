@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>Stock Symbol Prices</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <style type="text/css">
     button,
     div,
@@ -12,20 +13,30 @@
       margin: 10px;
     }
   </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
   <div class="container">
-    <h1>Stock Search</h1>
+    <h1 class="p-3 mb-2 bg-info text-white">Stock Search</h1>
+    <nav class="favoriteList" class="nav flex-column"></nav>
+    
+    
+
 
     <div id="buttons-view"></div>
 
     <form id="stock-form">
-      <label for="stock-input">Add a Stock Symbol</label>
-      <input type="text" id="stock-input"><br>
+      <label for="stock-input" id="stocks">Add a Stock Symbol</label>
+      <input type="text" id="stock-input" placeholder="Example: AMZN"><br>
 
-      <input id="add-stock" type="submit" value="Add a Stock Symbol">
+      <input id="add-stock" type="submit" value="Add a Stock Symbol" class="btn btn-success">
+      <input id="add-favorite" type="submit" value="Add a Stock to Your Favorites" class="btn btn-success">
+      <button id="clearButton" class="btn btn-danger">Clear</button>
+      <button id="clearFavorites" class="btn btn-danger">Clear Favorites</button>
+      
+
     </form>
 
     <div id="stocks-view"></div>

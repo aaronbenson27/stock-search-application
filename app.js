@@ -1,126 +1,178 @@
-// Initial array of stocks
-let stocksList = ['FB', 'AAPL', 'TSLA', 'GOOG'];
+const validationList = []
 
-// displaystockInfo function re-renders the HTML to display the appropriate content
+const stocksList = ['MSFT', 'AAPL', 'TSLA', 'GOOG'];
+
+var favoriteList = [];
+
+var storedList = [];
+if( localStorage.getItem('favorites')) {
+    storedList = localStorage.getItem('favorites').split(',');
+}
+
+
+const validateStocks = function () {
+    const queryURL = "https://api.iextrading.com/1.0/ref-data/symbols";
+
+    $.ajax({
+        url: queryURL,
+        method: 'GET'
+    }).then(function(response){
+        for (i=0; i<response.length; i++)
+        validationList.push(response[i].symbol)
+    })
+}
+validateStocks()
+
+
+const renderFavorites = function () {
+    $('.favoriteList').empty();
+    if( storedList.length > 0){
+        for (let i = 0; i < storedList.length; i++) {
+
+            let newButton = $('<button>');
+        
+            newButton.addClass('stock');
+        
+            newButton.addClass("btn btn-primary")
+
+            newButton.addClass("nav-item")
+        
+            newButton.attr('data-name', storedList[i]);
+        
+            newButton.text(storedList[i]);
+        
+            $('.favoriteList').append(newButton);
+        };
+    };
+};
+
+renderFavorites();
+
 const displaystockInfo = function () {
 
   const stock = $(this).attr('data-name');
-  const queryURL = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote,news&range=1m&last=1`;
+  const queryURL = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote,news,logo&range=1m&last=10`;
 
-  // Creates AJAX call for the specific stock button being clicked
   $.ajax({
     url: queryURL,
     method: 'GET'
   }).then(function(response) {
 
-    // Create a div to hold the stock
-      const holdStock = $('<div>')
+    const holdStock = $('<div class="stockWrapper">');
 
-    // Store the company name
-    const compName = response.quote.companyName
+    const logo = response.logo.url
 
-    // Create an element to display the company name
-    const displayName = $(`<p>${compName}</p>`)
+    const displayLogo = $(`<p class="logo"><img src="${logo}" alt="${response.quote.companyName}"></p>`);
 
-    // Append the name to our stockDiv
+    holdStock.append(displayLogo);
 
-    holdStock.append(displayName)
+    const compName = response.quote.companyName;
 
-    // Store the stock symbol
+    const displayName = $(`<p class="name">${compName}</p>`);
 
-    const stockSymbol = response.quote.symbol
+    holdStock.append(displayName);
 
-    // Create an element to display the stock symbol
+    const stockSymbol = response.quote.symbol;
 
-    const displaySymbol = $(`<p>${stockSymbol}</p>`)
+    const displaySymbol = $(`<p class="symbol">${stockSymbol}</p>`);
 
-    // Append the symbol to our stockDiv
+    holdStock.append(displaySymbol);
 
-    holdStock.append(displaySymbol)
+    const compPrice = response.quote.latestPrice;
 
-    // Store the price
+    const displayPrice = $(`<p class="price">Stock Price: ${compPrice}</p>`);
 
-    const compPrice = response.quote.latestPrice
+    holdStock.append(displayPrice);
 
-    // Create an element to display the price
+    holdStock.append('<p class="news">News Headlines:</p>')
 
-    const displayPrice = $(`<p>${compPrice}</p>`)
+    for (i = 0; i < response.news.length; i++) {
+        holdStock.append(`<a href="${response.news[i].url}"><p class="articleLink">${response.news[i].headline}</p></a>`);
+    }
 
-    // Append the price to our stockDiv
-
-    holdStock.append(displayPrice)
-
-    // Store the first news summary
-    let firstnews = ''
-    
-    firstnews += response.news[0]['headline']
-
-    // Create an element to display the news summary
-
-    displayNews = $(`<p>${firstnews}</p>`)
-
-    // Append the summary to our stockDiv
-
-    holdStock.append(displayNews)
-
-    // Finally add the stockDiv to the DOM
-
-    holdStock.appendTo('#stocks-view')
-
-    // Until this point nothing is actually displayed on our page
+    holdStock.prependTo('#stocks-view')
   });
+};
 
-}
-
-// Function for displaying stock data
 const render = function () {
 
-  // Deletes the stocks prior to adding new stocks
-  // (this is necessary otherwise you will have repeat buttons)
   $('#buttons-view').empty();
-  // Loops through the array of stocks
+
   for (let i = 0; i < stocksList.length; i++) {
 
-    // Then dynamicaly generates buttons for each stock in the array
-    // This code $("<button>") is all jQuery needs to create the beginning and end tag. (<button></button>)
     let newButton = $('<button>');
-    // Adds a class of stock to our button
-    newButton.addClass('stock');
-    // Added a data-attribute
-    newButton.attr('data-name', stocksList[i]);
-    // Provided the initial button text
-    newButton.text(stocksList[i]);
-    // Added the button to the buttons-view div
-    $('#buttons-view').append(newButton);
-  }
-}
 
-// This function handles events where one button is clicked
+    newButton.addClass('stock');
+
+    newButton.addClass("btn btn-primary")
+
+    newButton.attr('data-name', stocksList[i]);
+
+    newButton.text(stocksList[i]);
+
+    $('#buttons-view').append(newButton);
+  };
+};
+
 const addButton = function(event) {
 
-  // event.preventDefault() prevents the form from trying to submit itself.
-  // We're using a form so that the user can hit enter instead of clicking the button if they want
   event.preventDefault();
 
-  // This line will grab the text from the input box
-  const stock = $('#stock-input').val().trim();
-  
-  // The stock from the textbox is then added to our array
-  stocksList.push(stock);
+  const stock = $('#stock-input').val().trim().toUpperCase();
+  for (i=0; i < validationList.length; i++) {
+      if (stock === validationList[i]) {
+        stocksList.push(stock);
+      }
+  }
 
-  // Deletes the contents of the input
   $('#stock-input').val('');
 
-  // calling render which handles the processing of our stock array
   render();
 }
 
-// Even listener for #add-stock button
+const clearButton = function (event) {
+    event.preventDefault()
+    $('#stocks-view').empty()
+}
+
+const addFavorites = function (e) {
+    e.preventDefault();
+    const stock = $('#stock-input').val().trim().toUpperCase();
+  for (i=0; i < validationList.length; i++) {
+      if (stock === validationList[i] && storedList.indexOf(stock) === -1) {
+        if( !localStorage.getItem('favorites')) {
+            storedList.push(stock)
+            favoriteList = stock;
+        } else {
+            favoriteList = storedList.join(',') + "," + stock
+        }
+        localStorage.setItem("favorites", favoriteList);
+        storedList = localStorage.getItem('favorites').split(',');
+        }
+    }
+    renderFavorites()
+    $('#stock-input').val('');
+}
+
+const emptyFavorites = function (e) {
+    e.preventDefault();
+    localStorage.removeItem('favorites');
+    $('.favoriteList').empty();
+}
+
+
+
+$('#clearButton').on('click', clearButton)
+
 $('#add-stock').on('click', addButton);
 
-// Adding click event listeners to all elements with a class of "stock"
 $('#buttons-view').on('click', '.stock', displaystockInfo);
 
-// Calling the render function to display the intial buttons
+$('.favoriteList').on('click', '.stock', displaystockInfo);
+
+$('#add-favorite').on('click', addFavorites )
+
+$('#clearFavorites').on('click', emptyFavorites)
+
 render();
 

@@ -1,0 +1,30 @@
+a {
+    text-decoration: none !important;
+}
+.articleLink, .name, .symbol, .price, .news, #stocks {
+    color: black;
+}
+.articleLink:hover {
+    color: blue
+}
+body {
+    background: darkgrey;
+}
+#stocks {
+    margin: 10px;
+}
+nav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 7%;
+    background: darkgray;
+    text-align: center;
+    float: none;
+}
+.container {
+    background: white;
+    padding: 0px;
+    
+}
