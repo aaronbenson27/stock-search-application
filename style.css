@@ -8,7 +8,7 @@ a {
     color: blue
 }
 body {
-    background: darkgrey;
+    background-image: url('https://images.pexels.com/photos/187041/pexels-photo-187041.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260')
 }
 #stocks {
     margin: 10px;
@@ -22,9 +22,12 @@ nav {
     background: darkgray;
     text-align: center;
     float: none;
+    opacity: .9;
 }
 .container {
-    background: white;
+    background: darkgray;
     padding: 0px;
-    
+    opacity: .9;
+    margin-top: 0;
+    margin-bottom: 0;
 }
